@@ -35,7 +35,8 @@ class Simple
 
 #  Set some parameters of the shape.
 #  For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
-    ground = CP::Shape::Segment.new static_body, CP::Vec2.new(-320, -240), CP::Vec2.new(320, -240), 0.0
+    ground = Visible::Segment.new static_body, CP::Vec2.new(-320, -240), CP::Vec2.new(320, -240), 0.0 #CP::Shape::Segment.new static_body, CP::Vec2.new(-320, -240), CP::Vec2.new(320, -240), 0.0
+    @visible_shapes << ground
 
 #  Set some parameters of the shape.
 #  For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
@@ -59,7 +60,11 @@ class Simple
 
 #  Set some parameters of the body:
 #  For more info: http://code.google.com/p/chipmunk-physics/wiki/cpBody
+
+# Set the initial position
     ball_body.p = CP::Vec2.new 0, -100 + radius+5
+# Set the initial angular speed
+    ball_body.w = 1
 
 # Add the body to the space so it will be simulated and move around.
     @space.add_body ball_body
