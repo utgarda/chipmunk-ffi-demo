@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'chipmunk-ffi'
-
 class Simulation
 
   def visible_shapes
@@ -14,5 +11,13 @@ class Simulation
 
   def update(ticks = 0)
     @space.step 1.0/60.0
+  end
+
+  def grab(point)
+    @space.point_query_first(point, CP::ALL_ONES, 0)
+  end
+
+  def release
+
   end
 end

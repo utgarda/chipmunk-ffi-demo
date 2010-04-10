@@ -1,12 +1,15 @@
 require 'rubygems'
 require 'chipmunk-ffi'
 require 'simple'
+require 'jruby'
 
 
 class Sketch < Processing::App
   include Visible
 
   def setup
+    JRuby.objectspace=true
+
     frame_rate 30
 
     rect_mode RADIUS
@@ -31,14 +34,30 @@ class Sketch < Processing::App
       # Resetting all transformations possibly done by previous shapes' draw() method calls
       reset_matrix
 
-      # Drawing our stuff aroung the center of Processing window, not upper-left corner
+      # Drawing our stuff around the center of Processing window, not upper-left corner
       translate width/2, height/2
 
-      # In Chipmunk's demos Y axis is directed the other way , so we flip it'
+      # In Chipmunk's demos Y axis is directed the other way , so we flip it
       scale 1, -1
-      
+
+      stroke shape == @shape_grabbed ? 200 : 255
+
       shape.draw
     end
+
+  end
+
+  def mouse_pressed
+    @shape_grabbed = @demo.grab(mouse_to_space)
+  end
+
+  def mouse_released
+    @demo.release
+    @shape_grabbed = nil
+  end
+
+  def mouse_to_space
+    vec2(mouse_x - width/2, height/2 - mouse_y)
   end
 
 end
