@@ -18,7 +18,6 @@ class Sketch < Processing::App
     no_fill
 
     @demo = Simple.new
-    @demo.init
   end
 
 

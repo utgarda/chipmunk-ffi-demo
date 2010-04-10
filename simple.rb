@@ -1,16 +1,17 @@
 require 'rubygems'
 require 'chipmunk-ffi'
 require 'draw_space'
+require 'simulation'
 
-class Simple
+class Simple < Simulation
 
-  def visible_shapes
-    @visible_shapes
+  def initialize
+    super
+    init_space
+    declare_visible_shapes
   end
 
-  def init
-    @visible_shapes = []
-
+  def init_space
 #  Create an infinite mass body to attach ground segments and other static geometry to.
 #  We won't be adding this body to the space, because we don't want it to be simulated at all.
 #  Adding bodies to the space simulates them. (fall under the influence of gravity, etc)
@@ -35,13 +36,12 @@ class Simple
 
 #  Set some parameters of the shape.
 #  For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
-    ground = Visible::Segment.new static_body, CP::Vec2.new(-320, -240), CP::Vec2.new(320, -240), 0.0 #CP::Shape::Segment.new static_body, CP::Vec2.new(-320, -240), CP::Vec2.new(320, -240), 0.0
-    @visible_shapes << ground
+    @ground = Visible::Segment.new static_body, CP::Vec2.new(-320, -240), CP::Vec2.new(320, -240), 0.0 #CP::Shape::Segment.new static_body, CP::Vec2.new(-320, -240), CP::Vec2.new(320, -240), 0.0
 
 #  Set some parameters of the shape.
 #  For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
-    ground.e = 1.0
-    ground.u = 1.0
+    @ground.e = 1.0
+    @ground.u = 1.0
 
 #TODO ground->layers = NOT_GRABABLE_MASK; // Used by the Demo mouse grabbing code
 
@@ -49,7 +49,7 @@ class Simple
 #  If a shape never changes position, add it as static so Chipmunk knows it only needs to
 #  calculate collision information for it once when it is added.
 #  Do not change the postion of a static shape after adding it.
-    @space.add_static_shape ground
+    @space.add_static_shape @ground
 
 #  Add a moving circle object.
     radius = 15.0
@@ -73,11 +73,14 @@ class Simple
 #  Shapes are always defined relative to the center of gravity of the body they are attached to.
 #  When the body moves or rotates, the shape will move with it.
 #  Additionally, all of the cpSpaceAdd*() functions return the thing they added so you can create and add in one go.
-    ball_shape = @space.add_shape Visible::Circle.new(ball_body, radius, CP::ZERO_VEC_2) #CP::Shape::Circle.new(ball_body, radius, CP::ZERO_VEC_2)
-    @visible_shapes << ball_shape
-    ball_shape.e = 0.0
-    ball_shape.u = 0.9
+    @ball_shape = @space.add_shape Visible::Circle.new(ball_body, radius, CP::ZERO_VEC_2) #CP::Shape::Circle.new(ball_body, radius, CP::ZERO_VEC_2)
+    @ball_shape.e = 0.0
+    @ball_shape.u = 0.9
+  end
 
+  def declare_visible_shapes
+    @visible_shapes << @ground    
+    @visible_shapes << @ball_shape
   end
 
 #Update is called by the demo code each frame.
