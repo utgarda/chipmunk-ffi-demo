@@ -56,6 +56,10 @@ class Sketch < Processing::App
     @shape_grabbed = nil
   end
 
+  def mouse_dragged
+    @demo.drag mouse_to_space
+  end
+
   def mouse_to_space
     vec2(mouse_x - width/2, height/2 - mouse_y)
   end
