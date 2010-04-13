@@ -1,7 +1,5 @@
-
-
 class Simulation
-  attr_reader :visible_shapes 
+  attr_reader :visible_shapes
 
   def initialize
     @visible_shapes = []
@@ -15,8 +13,9 @@ class Simulation
 
   def grab(point)
     release
+    @last_mouse_point = point
     shape = @space.point_query_first(point, CP::ALL_ONES, 0)
-    if(shape)
+    if (shape)
       @mouse_joint = CP::PivotJoint.new @mouse_body, shape.body, CP::ZERO_VEC_2, shape.body.world2local(point)
       @mouse_joint.max_force = 50000.0
       @mouse_joint.bias_coef = 0.15
@@ -32,7 +31,12 @@ class Simulation
   end
 
   def drag(point)
-    @mouse_body.p = point if @mouse_joint  #TODO set velocity too
+    if @mouse_joint
+      new_point = @last_mouse_point.lerp(point, 0.25)
+      @mouse_body.p = new_point
+      @mouse_body.v = (new_point - @last_mouse_point) * 60
+      @last_mouse_point = new_point
+    end
   end
 
 end
