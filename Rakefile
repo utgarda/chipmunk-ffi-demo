@@ -9,6 +9,20 @@ require 'git'
                :nice_ffi => 'git://github.com/jacius/nice-ffi.git',
                :ffi_jruby =>'git://github.com/ffi/ffi-jruby.git'}
 
+def download_gem(spec)
+  Gem::RemoteFetcher.fetcher().download(spec, Gem.default_sources()[0], ".")
+end
+
+task :fetch_gems do
+  ["nice-ffi", "chipmunk-ffi"].each do |gem_name|
+    dependency = Gem::Dependency.new(gem_name, Gem::Requirement.default)
+    download_gem Gem::SpecFetcher.fetcher().fetch(dependency)[0][0]
+  end
+  ffi_dependency = Gem::Dependency.new("ffi", Gem::Requirement.default)
+  ffi_jruby_spec = Gem::SpecFetcher.fetcher().fetch(ffi_dependency, false, false).select{|s| s[0].platform.to_s == "java"}[0][0]
+  download_gem ffi_jruby_spec
+end
+
 def clone(project_name)
   FileUtils.rm_rf project_name.to_s if File.exist?(project_name.to_s)
   print "Cloning #{project_name} ... "
